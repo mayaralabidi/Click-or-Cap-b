@@ -1,5 +1,8 @@
 // Configuration
 const API_BASE_URL = 'http://localhost:8000';
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 500;
+const API_UNAVAILABLE_COOLDOWN_MS = 60000; // Skip API calls for 1 min after repeated failures
 
 // Content Script - Main Logic
 console.log('Click-or-Cap: Content script loaded');
@@ -7,6 +10,7 @@ console.log('Click-or-Cap: Content script loaded');
 // State
 let userId = null;
 let isEnabled = true;
+let apiFailureCount = 0;
 
 // Initialize user ID
 async function initializeUser() {
@@ -20,19 +24,74 @@ async function initializeUser() {
     console.log('Click-or-Cap: User ID:', userId);
 }
 
-// API Functions
-async function callAPI(endpoint, data) {
+// Store API status for popup
+async function setApiAvailable(available) {
+    await chrome.storage.local.set({
+        apiAvailable: available,
+        apiLastCheck: Date.now()
+    });
+}
+
+// Check if we should skip API calls (cooldown after failures)
+async function shouldSkipApiCalls() {
+    const { apiAvailable, apiLastCheck } = await chrome.storage.local.get(['apiAvailable', 'apiLastCheck']);
+    if (apiAvailable === true) return false;
+    if (apiAvailable === false && apiLastCheck && (Date.now() - apiLastCheck) < API_UNAVAILABLE_COOLDOWN_MS) {
+        return true; // Skip during cooldown
+    }
+    return false;
+}
+
+// API Functions with retry, detailed logging, and availability tracking
+async function callAPI(endpoint, data, retries = MAX_RETRIES) {
+    const url = `${API_BASE_URL}${endpoint}`;
+
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        // Skip if we recently detected API as unavailable
+        if (await shouldSkipApiCalls()) return null;
+
+        const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        return await response.json();
+
+        const text = await response.text();
+        let parsed;
+        try {
+            parsed = text ? JSON.parse(text) : null;
+        } catch {
+            parsed = null;
+        }
+
+        if (!response.ok) {
+            apiFailureCount++;
+            if (apiFailureCount >= 3) await setApiAvailable(false);
+            console.warn(`[Click-or-Cap] API ${response.status}: ${url}`, response.statusText, parsed?.detail || text?.slice(0, 100));
+            return null;
+        }
+
+        apiFailureCount = 0;
+        await setApiAvailable(true);
+        return parsed;
+
     } catch (error) {
-        console.error('API Error:', error);
+        apiFailureCount++;
+        if (apiFailureCount >= 3) await setApiAvailable(false);
+
+        const errDetails = {
+            url,
+            message: error.message,
+            name: error.name,
+            type: error instanceof TypeError ? 'network' : 'unknown'
+        };
+
+        if (retries > 0 && (error.message?.includes('fetch') || error.name === 'TypeError')) {
+            await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+            return callAPI(endpoint, data, retries - 1);
+        }
+
+        console.warn('[Click-or-Cap] API unavailable:', errDetails);
         return null;
     }
 }
@@ -233,14 +292,28 @@ async function scanPage() {
     }
 }
 
+// Check API health (lightweight, no spam)
+async function checkApiHealth() {
+    try {
+        const r = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });
+        const ok = r.ok;
+        await setApiAvailable(ok);
+        return ok;
+    } catch {
+        await setApiAvailable(false);
+        return false;
+    }
+}
+
 // Initialize
 (async function init() {
     await initializeUser();
-    
+    await checkApiHealth();
+
     // Attach empathy mirror to inputs
     attachEmpathyMirror();
-    
-    // Scan existing content
+
+    // Scan existing content (callAPI will skip if API unavailable)
     await scanPage();
     
     // Observer for new content

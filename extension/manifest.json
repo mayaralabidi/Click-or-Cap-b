@@ -5,7 +5,8 @@
   "description": "AI-powered extension to detect and combat hate speech, toxicity, and misinformation online",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "contextMenus"
   ],
   "host_permissions": [
     "<all_urls>"

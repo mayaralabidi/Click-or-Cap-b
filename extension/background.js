@@ -12,30 +12,39 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-    if (info.menuItemId === 'de-escalate-reply') {
-        const selectedText = info.selectionText;
+    if (info.menuItemId !== 'de-escalate-reply' || !info.selectionText) return;
 
-        // Call de-escalation API
-        try {
-            const response = await fetch('http://localhost:8000/decision/de-escalate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ context: selectedText })
-            });
+    const selectedText = info.selectionText;
 
-            const result = await response.json();
+    try {
+        const response = await fetch('http://localhost:8000/decision/de-escalate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ context: selectedText })
+        });
 
-            // Send options to content script
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'showDeEscalationOptions',
-                options: result.options,
-                recommended: result.recommended
-            });
-        } catch (error) {
-            console.error('De-escalation error:', error);
+        if (!response.ok) {
+            console.warn('[Click-or-Cap] De-escalate API:', response.status);
+            return;
         }
+
+        const result = await response.json();
+        if (!result?.options) return;
+
+        if (tab?.id) {
+            try {
+                await chrome.tabs.sendMessage(tab.id, {
+                    action: 'showDeEscalationOptions',
+                    options: result.options,
+                    recommended: result.recommended
+                });
+            } catch (msgErr) {
+                // Content script may not be loaded (e.g. chrome:// pages)
+                console.warn('[Click-or-Cap] Could not send to tab:', msgErr.message);
+            }
+        }
+    } catch (error) {
+        console.warn('[Click-or-Cap] De-escalation error:', error.message);
     }
 });
 

@@ -84,12 +84,46 @@
             text-align: center;
             opacity: 0.7;
         }
+
+        .api-unavailable {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .api-unavailable-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .api-unavailable-icon {
+            font-size: 18px;
+        }
+
+        .api-unavailable code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
     <h1>🌸 Click or Cap</h1>
+
+    <div id="apiUnavailable" class="api-unavailable" style="display: none;">
+        <div class="api-unavailable-inner">
+            <span class="api-unavailable-icon">⚠️</span>
+            <strong>API unavailable</strong>
+            <p>Start the backend: <code>uvicorn backend.main:app --port 8000</code></p>
+        </div>
+    </div>
     
-    <div class="stats">
+    <div class="stats" id="statsContainer">
         <div class="stat-row">
             <span class="stat-label">Your Score</span>
             <span class="stat-value" id="userScore">0</span>
