@@ -1,4 +1,6 @@
 # pyre-ignore-all-errors[21]  # Pyre cannot see venv packages
+import io
+import zipfile
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -9,13 +11,16 @@ if _backend_env.exists():
 else:
     load_dotenv()
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import StreamingResponse
 from backend.routers import decision, users
 
-# Path to frontend folder (project root / frontend)
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+# Paths (project root relative to backend/)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = PROJECT_ROOT / "frontend"
+EXTENSION_DIR = PROJECT_ROOT / "extension"
 
 app = FastAPI(
     title="Click-or-Cap API",
@@ -61,6 +66,31 @@ def health_ai():
         "mistral_configured": bool(key and key != "missing_key"),
         "hint": "Add MISTRAL_API_KEY to backend/.env (get key from console.mistral.ai)" if not key else "OK",
     }
+
+
+@app.get("/download/extension")
+def download_extension():
+    """Download the browser extension as a zip file (free option - no Chrome Web Store)."""
+    if not EXTENSION_DIR.exists():
+        raise HTTPException(status_code=404, detail="Extension folder not found")
+
+    # Exclude unnecessary files
+    exclude = {".git", "__pycache__", ".DS_Store", "node_modules", "test-page.html"}
+
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+        for file_path in EXTENSION_DIR.rglob("*"):
+            if file_path.is_file() and not any(p in file_path.parts for p in exclude):
+                arcname = file_path.relative_to(EXTENSION_DIR)
+                zf.write(file_path, arcname)
+
+    buffer.seek(0)
+    return StreamingResponse(
+        buffer,
+        media_type="application/zip",
+        headers={"Content-Disposition": "attachment; filename=click-or-cap-extension.zip"},
+    )
+
 
 # Serve frontend (index, image_analysis, dashboard) - mount last so API routes take precedence
 if FRONTEND_DIR.exists():
