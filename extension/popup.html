@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click or Cap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 350px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .button {
+            width: 100%;
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .footer {
+            margin-top: 15px;
+            font-size: 12px;
+            text-align: center;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌸 Click or Cap</h1>
+    
+    <div class="stats">
+        <div class="stat-row">
+            <span class="stat-label">Your Score</span>
+            <span class="stat-value" id="userScore">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Positive Actions</span>
+            <span class="stat-value" id="actionCount">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Content Blocked</span>
+            <span class="stat-value" id="blockedCount">0</span>
+        </div>
+    </div>
+    
+    <button class="button" id="viewLeaderboard">🏆 View Leaderboard</button>
+    
+    <div class="footer">
+        Fighting hate speech with kindness
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# pyproject.toml - Python project configuration
+[tool.pyre]
+search_path = [".venv/Lib/site-packages"]
+
+[tool.pyright]
+venvPath = "."
+venv = "venv"
+pythonVersion = "3.10"
+typeCheckingMode = "basic"

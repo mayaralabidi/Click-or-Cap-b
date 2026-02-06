@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extension Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .comment {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .username {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🌸 Click or Cap - Extension Test Page</h1>
+    <p>This page is designed to test the Chrome Extension features.</p>
+
+    <div class="test-section">
+        <h2>1. Empathy Mirror Test</h2>
+        <p>Try typing something potentially toxic or mean in the text area below. The extension should show you a
+            warning!</p>
+        <textarea placeholder="Type your message here... Try something like 'You are so stupid and dumb!'"></textarea>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Content Moderation Test</h2>
+        <p>The extension should scan and hide/warn about the toxic comments below:</p>
+
+        <div class="comment">
+            <div class="username">@HatefulUser123</div>
+            <p>I hate all people from that country, they are stupid idiots!</p>
+        </div>
+
+        <div class="comment">
+            <div class="username">@AngryPerson</div>
+            <p>You're an idiot for thinking that way. Only morons believe this nonsense.</p>
+        </div>
+
+        <div class="comment">
+            <div class="username">@NiceUser</div>
+            <p>I respectfully disagree with your perspective, but I appreciate you sharing your thoughts. Let's discuss
+                this calmly.</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. De-Escalation Test</h2>
+        <p>Right-click on the toxic comment below and select "💬 Help me reply to this"</p>
+
+        <div class="comment">
+            <div class="username">@RudeCommenter</div>
+            <p>Your opinion is worthless and you're clearly an idiot if you believe that garbage.</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Instructions</h2>
+        <ol>
+            <li>Make sure the backend server is running on port 8000</li>
+            <li>Load the extension in Chrome (chrome://extensions/)</li>
+            <li>Reload this page</li>
+            <li>Test each feature above</li>
+            <li>Click the extension icon to see your stats!</li>
+        </ol>
+    </div>
+</body>
+
+</html>
