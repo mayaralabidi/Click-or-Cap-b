@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click or Cap - Image Analysis Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 24px;
+        }
+
+        .upload-section {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-container {
+            margin-top: 1.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #analyzeBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        #analyzeBtn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f8fafc;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .badge.safe {
+            background: #def7ec;
+            color: #03543f;
+        }
+
+        .badge.warning {
+            background: #fdf6b2;
+            color: #723b13;
+        }
+
+        .badge.toxic {
+            background: #fde8e8;
+            color: #9b1c1c;
+        }
+
+        .score-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            transition: width 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>📸 Hate Speech Image Detector</h1>
+
+        <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+            <p>Click to upload a screenshot or image</p>
+            <span style="font-size: 40px;">📂</span>
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
+
+        <div class="preview-container" id="previewContainer">
+            <img id="imagePreview" src="" alt="Preview">
+            <div class="actions">
+                <button id="analyzeBtn" onclick="analyzeImage()">
+                    <div class="loader" id="loader"></div>
+                    Analyze Image
+                </button>
+            </div>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <div id="badge" class="badge"></div>
+            <h3 id="resultTitle"></h3>
+            <div class="score-bar">
+                <div class="score-fill" id="scoreFill"></div>
+            </div>
+            <p><strong>Toxicity Score:</strong> <span id="scoreValue"></span>/100</p>
+            <p><strong>Reason:</strong> <span id="reasonText"></span></p>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 1rem 0;">
+            <p style="font-size: 0.9em; color: #666;"><strong>AI Analysis:</strong><br><span id="analysisText"></span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentBase64 = null;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // Send full data URL to preserve MIME type (PNG, JPEG, etc.)
+                    currentBase64 = e.target.result;
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    document.getElementById('previewContainer').style.display = 'block';
+                    document.getElementById('resultBox').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function analyzeImage() {
+            if (!currentBase64) return;
+
+            const btn = document.getElementById('analyzeBtn');
+            const loader = document.getElementById('loader');
+
+            btn.disabled = true;
+            loader.style.display = 'inline-block';
+            btn.innerHTML = '<div class="loader" style="display:inline-block"></div> Analyzing...';
+
+            try {
+                const response = await fetch('http://localhost:8000/decision/analyze-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image_data: currentBase64
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.detail || data.message || 'Analysis failed');
+                }
+                displayResult(data);
+
+            } catch (error) {
+                alert('Error analyzing image: ' + (error.message || String(error)));
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Analyze Image';
+            }
+        }
+
+        function displayResult(data) {
+            const box = document.getElementById('resultBox');
+            const badge = document.getElementById('badge');
+            const fill = document.getElementById('scoreFill');
+
+            box.style.display = 'block';
+
+            // Update content
+            document.getElementById('scoreValue').textContent = data.score;
+            document.getElementById('reasonText').textContent = data.reason;
+            document.getElementById('analysisText').textContent = data.analysis;
+
+            // Style based on action
+            if (data.action === 'HIDE') {
+                badge.className = 'badge toxic';
+                badge.textContent = '⛔ HIDE CONTENT';
+                fill.style.background = '#e53e3e';
+            } else if (data.action === 'WARN') {
+                badge.className = 'badge warning';
+                badge.textContent = '⚠️ WARNING';
+                fill.style.background = '#d69e2e';
+            } else {
+                badge.className = 'badge safe';
+                badge.textContent = '✅ SAFE';
+                fill.style.background = '#38a169';
+            }
+
+            // Animate score bar
+            fill.style.width = '0%';
+            setTimeout(() => {
+                fill.style.width = data.score + '%';
+            }, 100);
+        }
+    </script>
+
+</body>
+
+</html>

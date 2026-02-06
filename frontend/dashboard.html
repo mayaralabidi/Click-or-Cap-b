@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click or Cap - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --dark: #0f172a;
+            --panel: #1e293b;
+            --light: #f8fafc;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--panel);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards & Inputs */
+        .card {
+            background: var(--panel);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            font-size: 1rem;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .result-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .badge.hide {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.warn {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--warning);
+        }
+
+        .badge.allow {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        /* Weather Widget */
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">🚀 Click or Cap</div>
+        <div class="nav-item active" onclick="switchView('dashboard')">📊 Dashboard</div>
+        <div class="nav-item" onclick="switchView('analyze')">🔍 AI Analysis</div>
+        <div class="nav-item" onclick="switchView('empathy')">🪞 Empathy Mirror</div>
+        <div class="nav-item" onclick="switchView('deescalate')">🕊️ De-Escalator</div>
+        <div class="nav-item" style="margin-top: auto;" onclick="window.location.href='index.html'">🏠 Home</div>
+    </nav>
+
+    <div class="main">
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard" class="view-section active">
+            <div class="header">
+                <h2>Hate Weather Report 🌤️</h2>
+                <div style="color: #94a3b8;">Global Status: <span style="color: var(--success);">Mostly Peaceful</span>
+                </div>
+            </div>
+
+            <div class="weather-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Messages Analyzed</div>
+                    <div class="stat-val">1,248</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Toxicity Blocked</div>
+                    <div class="stat-val" style="color: var(--danger);">14%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Empathy Used</div>
+                    <div class="stat-val" style="color: var(--success);">856</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Users Protected</div>
+                    <div class="stat-val">342</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem;">
+                <h3>Recent Activity</h3>
+                <div style="margin-top: 1rem; color: #94a3b8;">
+                    <p style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">🛡️ <b>User_842</b>
+                        de-escalated a thread in #gaming</p>
+                    <p style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">⚠️ <b>Auto-Mod</b>
+                        flagged a comment (Severity: 85%)</p>
+                    <p style="padding: 0.5rem 0;">🪞 <b>User_11</b> rewrote a draft using Empathy Mirror</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYZE VIEW -->
+        <div id="analyze" class="view-section">
+            <div class="header">
+                <h2>Content Analysis Agent</h2>
+            </div>
+            <div class="card">
+                <h3>Check Text for Toxicity</h3>
+                <textarea id="analyzeText" placeholder="Paste some text here to check if it's safe..."></textarea>
+                <button class="btn" onclick="analyzeContent()">Check Text</button>
+                <div id="analyzeResult" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- EMPATHY VIEW -->
+        <div id="empathy" class="view-section">
+            <div class="header">
+                <h2>Empathy Mirror 🪞</h2>
+            </div>
+            <div class="card">
+                <h3>Draft Check</h3>
+                <p style="color: #94a3b8; margin-bottom: 1rem;">See how your message sounds to others before you send
+                    it.</p>
+                <textarea id="empathyText" placeholder="Type your draft here..."></textarea>
+                <button class="btn" onclick="checkEmpathy()">Check Draft</button>
+                <div id="empathyResult" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- DE-ESCALATE VIEW -->
+        <div id="deescalate" class="view-section">
+            <div class="header">
+                <h2>De-Escalation Assistant 🕊️</h2>
+            </div>
+            <div class="card">
+                <h3>Reply to Conflict</h3>
+                <p style="color: #94a3b8; margin-bottom: 1rem;">Paste a toxic message you received. We'll generate safe
+                    ways to reply.</p>
+                <textarea id="toxicContext" placeholder="Paste the rude comment here..."></textarea>
+                <button class="btn" onclick="generateReplies()">Generate Options</button>
+                <div id="replyResult" class="result-box"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(viewId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function analyzeContent() {
+            const text = document.getElementById('analyzeText').value;
+            const res = await fetch(`${API_BASE}/decision/engine`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text })
+            });
+            const data = await res.json();
+
+            const resultBox = document.getElementById('analyzeResult');
+            resultBox.style.display = 'block';
+            let color = data.action === 'Allow' ? 'var(--success)' : data.action === 'Warn' ? 'var(--warning)' : 'var(--danger)';
+            // Normalize action case from backend
+            const action = data.action.toUpperCase();
+            const badgeClass = action === 'ALLOW' ? 'allow' : action === 'WARN' ? 'warn' : 'hide';
+
+            resultBox.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                    <span class="badge ${badgeClass}">${action}</span>
+                    <span style="font-weight: bold;">Score: ${data.score.toFixed(1)}</span>
+                </div>
+                <p>${data.reason}</p>
+                ${data.replacement_content ? `<p style="margin-top:0.5rem; opacity:0.8; font-style:italic;">Suggestion: ${data.replacement_content}</p>` : ''}
+            `;
+        }
+
+        async function checkEmpathy() {
+            const text = document.getElementById('empathyText').value;
+            const res = await fetch(`${API_BASE}/decision/empathy-check`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ draft_text: text })
+            });
+            const data = await res.json();
+
+            const resultBox = document.getElementById('empathyResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">${data.predicted_reaction_emoji}</div>
+                <p><b>Analysis:</b> ${data.warning_message}</p>
+                <div style="margin-top: 1rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 8px;">
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.3rem;">BETTER VERSION:</div>
+                    "${data.civilized_version}"
+                </div>
+            `;
+        }
+
+        async function generateReplies() {
+            const context = document.getElementById('toxicContext').value;
+            const resultBox = document.getElementById('replyResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = 'Generating options... (this calls Mistral AI, give it a moment)';
+
+            try {
+                const res = await fetch(`${API_BASE}/decision/de-escalate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ context: context }) // Backend expects 'context'
+                });
+                const data = await res.json();
+
+                let html = '<h3>Suggested Replies:</h3><div style="display: grid; gap: 1rem; margin-top: 1rem;">';
+                data.options.forEach(opt => {
+                    html += `
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; cursor: pointer; border: 1px solid transparent;" 
+                             onclick="navigator.clipboard.writeText(this.innerText); alert('Copied!');">
+                            ${opt}
+                        </div>`;
+                });
+                html += '</div><p style="margin-top:1rem; font-size:0.8rem; opacity:0.6;">Click to copy</p>';
+                resultBox.innerHTML = html;
+            } catch (e) {
+                resultBox.innerHTML = 'Error contacting AI assistant. Ensure server is running.';
+            }
+        }
+    </script>
+</body>
+
+</html>

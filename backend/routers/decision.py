@@ -1,80 +1,91 @@
 # pyre-ignore-all-errors[21]  # Pyre cannot see venv packages
+import re
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from backend.core.models import (
     DecisionRequest, DecisionResponse,
     AlternativeRequest, AlternativeResponse,
     EmpathyCheckRequest, EmpathyCheckResponse,
     DeEscalateRequest, DeEscalateResponse
 )
-import random
+from backend.core.ai import (
+    analyze_toxicity,
+    analyze_image,
+    generate_reply_options,
+    generate_civilized_version
+)
+from typing import Optional
 
 router = APIRouter()
 
-def calculate_hate_score(analysis_results: dict) -> float:
-    """
-    Calculate hate score based on analysis results from Backend 1
-    Returns a score between 0 and 100
-    """
-    # Mock implementation - will integrate with real analysis
-    toxicity = analysis_results.get("toxicity", 0)
-    hate_speech = analysis_results.get("hate_speech", 0)
-    offensive_words = analysis_results.get("offensive_words", 0)
-    
-    # Weighted formula
-    score = (toxicity * 0.4 + hate_speech * 0.4 + offensive_words * 0.2) * 100
-    return min(100, max(0, score))
 
-def determine_action(score: float) -> str:
-    """Determine action based on hate score"""
+class ImageAnalyzeRequest(BaseModel):
+    image_data: Optional[str] = None
+    image_url: Optional[str] = None
+    description: Optional[str] = None
+
+
+def _parse_ai_rating(text: str) -> tuple[float, str]:
+    """Extract rating and reason from AI response like 'Rating: 85\nReason: ...'"""
+    score = 0.0
+    reason = text.strip()
+    match = re.search(r'Rating[:\s]+(\d+)', text, re.IGNORECASE)
+    if match:
+        score = float(match.group(1))
+    reason_match = re.search(r'Reason[:\s]+(.+?)(?:\n|$)', text, re.IGNORECASE | re.DOTALL)
+    if reason_match:
+        reason = reason_match.group(1).strip()
+    return min(100, max(0, score)), reason
+
+
+def _score_to_action(score: float) -> str:
     if score >= 70:
         return "HIDE"
-    elif score >= 40:
+    if score >= 30:
         return "WARN"
-    else:
-        return "ALLOW"
+    return "ALLOW"
+
 
 @router.post("/engine", response_model=DecisionResponse)
 async def decision_engine(request: DecisionRequest):
-    """
-    Main decision engine - analyzes content and decides action
-    Backend 2 Core Function
-    """
-    # Mock analysis if not provided
-    if not request.analysis_results:
-        # Simple mock based on text
-        if request.text:
-            text_lower = request.text.lower()
-            toxicity = 0.8 if any(word in text_lower for word in ["hate", "stupid", "idiot"]) else 0.2
-            analysis_results = {
-                "toxicity": toxicity,
-                "hate_speech": toxicity * 0.9,
-                "offensive_words": 0.5 if "fuck" in text_lower else 0
-            }
-        else:
-            analysis_results = {"toxicity": 0, "hate_speech": 0, "offensive_words": 0}
-    else:
-        analysis_results = request.analysis_results
-    
-    score = calculate_hate_score(analysis_results)
-    action = determine_action(score)
-    
-    # Generate reason
-    if action == "HIDE":
-        reason = "Content contains severe hate speech or toxic language"
-        replacement = "🌸 This content has been hidden to maintain a positive space."
-    elif action == "WARN":
-        reason = "Content may contain inappropriate language"
-        replacement = "⚠️ Content flagged for review"
-    else:
-        reason = "Content is acceptable"
-        replacement = None
-    
+    """Analyze text for toxicity and return HIDE/WARN/ALLOW decision."""
+    if not request.text:
+        raise HTTPException(status_code=400, detail="Text is required")
+    analysis = await analyze_toxicity(request.text)
+    score, reason = _parse_ai_rating(analysis)
+    action = _score_to_action(score)
+    replacement = None
+    if action in ("HIDE", "WARN"):
+        replacement = await generate_civilized_version(request.text)
     return DecisionResponse(
         action=action,
         score=score,
         reason=reason,
-        replacement_content=replacement
+        replacement_content=replacement,
     )
+
+
+@router.post("/analyze-image")
+async def analyze_image_endpoint(request: ImageAnalyzeRequest):
+    """Analyze image for hate speech using Pixtral vision model."""
+    if not request.image_data and not request.image_url:
+        raise HTTPException(status_code=400, detail="image_data or image_url is required")
+    analysis = await analyze_image(
+        image_data=request.image_data,
+        image_url=request.image_url,
+        description=request.description,
+    )
+    if analysis.startswith("Error") or analysis == "No image provided":
+        raise HTTPException(status_code=500, detail=analysis)
+    score, reason = _parse_ai_rating(analysis)
+    action = _score_to_action(score)
+    return {
+        "action": action,
+        "score": int(score),
+        "reason": reason,
+        "analysis": analysis,
+    }
+
 
 @router.post("/generate-alternative", response_model=AlternativeResponse)
 async def generate_alternative(request: AlternativeRequest):
@@ -82,21 +93,16 @@ async def generate_alternative(request: AlternativeRequest):
     Generate polite alternative text (De-Escalation)
     Uses LLM to rewrite toxic/angry text constructively
     """
-    # Mock implementation - will integrate OpenAI/Gemini later
     text = request.original_text
     mood = request.mood
     
-    # Simple hardcoded alternatives for demo
-    alternatives = {
-        "polite": f"I respectfully disagree with your perspective on this matter.",
-        "educational": f"Let me share some facts that might help clarify this topic.",
-        "firm": f"I understand your frustration, but I must point out that this approach isn't constructive."
-    }
+    # Use Real AI to rewrite
+    civilized_text = await generate_civilized_version(text)
     
     return AlternativeResponse(
         original=text,
-        alternative=alternatives.get(mood, alternatives["polite"]),
-        improvement_note=f"Rewritten in a {mood} tone to promote healthy discussion"
+        alternative=civilized_text,
+        improvement_note=f"Rewritten by AI to be more constructive"
     )
 
 @router.post("/empathy-check", response_model=EmpathyCheckResponse)
@@ -105,28 +111,33 @@ async def empathy_check(request: EmpathyCheckRequest):
     Empathy Mirror Feature
     Check if user's draft message might hurt someone
     """
-    text = request.draft_text.lower()
+    text = request.draft_text
     
-    # Simple toxicity detection
-    toxic_words = ["hate", "stupid", "idiot", "dumb", "moron", "fuck"]
-    toxicity = sum(1 for word in toxic_words if word in text) / len(toxic_words)
+    # Real AI Analysis
+    analysis = await analyze_toxicity(text)
+    
+    # Parse score from string "Rating: 85..."
+    score = 0
+    match = re.search(r'Rating[:\s]+(\d+)', analysis, re.IGNORECASE)
+    if match:
+        score = float(match.group(1))
     
     # Determine reaction
-    if toxicity > 0.5:
+    if score > 50:
         emoji = "😢"
-        warning = "This message might hurt someone's feelings. Consider being kinder."
-        civilized = "I disagree with your point, but I'd like to understand your perspective better."
-    elif toxicity > 0.2:
+        warning = "This message seems hurtful. Consider rephrasing."
+        civilized = await generate_civilized_version(text)
+    elif score > 20:
         emoji = "😕"
-        warning = "This message could be misunderstood. Maybe soften the tone?"
-        civilized = request.draft_text  # Minor adjustment needed
+        warning = "This could be misunderstood."
+        civilized = await generate_civilized_version(text)
     else:
         emoji = "😊"
         warning = "This message looks respectful!"
-        civilized = request.draft_text
+        civilized = text
     
     return EmpathyCheckResponse(
-        toxicity=toxicity,
+        toxicity=score/100.0, # Normalize to 0-1
         predicted_reaction_emoji=emoji,
         civilized_version=civilized,
         warning_message=warning
@@ -138,13 +149,17 @@ async def de_escalate(request: DeEscalateRequest):
     De-Escalation Assistant
     Generate constructive replies to toxic content
     """
-    options = [
-        "I understand you feel strongly about this. Can we discuss the facts calmly?",
-        "Let's focus on the issue rather than personal attacks.",
-        "I see your point, but let me offer a different perspective based on evidence."
+    # Use Real AI to generate options
+    # Note: request.context corresponds to the text we are replying to
+    options_dict = await generate_reply_options(request.context)
+    
+    options_list = [
+        options_dict.get("polite", "I understand your point."),
+        options_dict.get("educational", "Let's look at the facts."),
+        options_dict.get("firm", "Let's keep this civil.")
     ]
     
     return DeEscalateResponse(
-        options=options,
-        recommended=options[0]
+        options=options_list,
+        recommended=options_list[0]
     )

@@ -1,0 +1,7 @@
+﻿{
+    "action":  "HIDE",
+    "score":  85.0,
+    "reason":  "Image contains severe hate speech or highly toxic content",
+    "replacement_content":  "ð¸ This image has been hidden to maintain a positive space.",
+    "analysis":  "Screenshot Analysis:\nInput: [Screenshot analyzed] I hate you all idiots\n\nResult: **Toxicity Rating: 80**\n\nAnalysis:\n\n- **Hate speech:** The text contains a clear and direct insult directed towards a group of people (\"idiots\"). This is a classic example of hate speech, targeting a specific group.\n- **Offensive content:** The text contains strong, derogatory language, including the phrase \"hate you all.\" This kind of language is designed to offend and provoke.\n- **Tone and intent:** The tone of the text is clearly aggressive and hostile, with an intent to provoke a reaction from the targeted group.\n- **Impact:** The text has the potential to cause emotional distress and harm to the targeted group, and may be perceived as harassment.\n\nRating criteria:\n\n- 0-30: No hate speech or toxicity\n- 31-50: Mild hate speech or toxicity\n- 51-70: Moderate hate speech or toxicity\n- 71-90: Significant hate speech or toxicity\n- 91-100: Extreme hate speech or toxicity\n\nBased on the analysis, I would rate this text as 80, indicating significant hate speech and toxicity."
+}

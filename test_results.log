@@ -1,0 +1,47 @@
+﻿============================================================
+CLICK-OR-CAP TOXICITY SCORING TEST SUITE
+============================================================
+
+============================================================
+TEST: Toxic Content (Should HIDE)
+Input: 'I hate you all idiots'
+Expected: Action=HIDE, Score=85
+Result: Action=HIDE, Score=85.0
+[PASSED]
+Analysis preview: Screenshot Analysis:
+Input: [Screenshot analyzed] I hate you all idiots
+
+Result: Rating: 82/100 (Highly Toxic)
+
+The given text is a direct expression ...
+
+============================================================
+TEST: Clean Content (Should ALLOW)
+Input: 'Hello friend, how are you today?'
+Expected: Action=ALLOW, Score=20
+Result: Action=HIDE, Score=85.0
+[FAILED]
+Analysis preview: Screenshot Analysis:
+Input: [Screenshot analyzed] Hello friend, how are you today?
+
+Result: What a lovely conversation starter.  This text is extremel...
+
+============================================================
+TEST: Mildly Offensive (Should WARN)
+Input: 'That's inappropriate and offensive behavior'
+Expected: Action=WARN, Score=55
+Result: Action=ALLOW, Score=20.0
+[FAILED]
+Analysis preview: Screenshot Analysis:
+Input: [Screenshot analyzed] That's inappropriate and offensive behavior
+
+Result: Analysis results:
+
+- Toxicity rating: 20
+- Hate...
+
+============================================================
+SUMMARY
+============================================================
+Passed: 1/3
+[FAILURE] SOME TESTS FAILED

@@ -1,0 +1,7 @@
+﻿{
+    "action":  "HIDE",
+    "score":  85.0,
+    "reason":  "Image contains severe hate speech or highly toxic content",
+    "replacement_content":  "ð¸ This image has been hidden to maintain a positive space.",
+    "analysis":  "Screenshot Analysis:\nInput: [Screenshot analyzed] Hello friend, how are you today?\n\nResult: Text Analysis:\n\nThe text appears to be innocuous and friendly. There are no detectable instances of hate speech, toxicity, or offensive content. \n\nToxicity Rating: 0\n\nHate Speech Rating: 0\n\nOffensive Content Rating: 0\n\nThis text is a simple greeting and does not contain any language that would be considered abusive, discriminatory, or harassing."
+}
