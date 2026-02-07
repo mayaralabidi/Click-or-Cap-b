@@ -3,7 +3,9 @@
 An AI-powered browser extension and web app that detects hate speech, toxicity, and harmful content in text and images. Users earn points for positive actions and can access de-escalation tools.
 
 ---
-
+Demo Video Link:
+https://youtu.be/BC7KKKbVmpE
+---
 ## Features
 
 - **Text & Image Detection** — Analyze content for hate speech using Mistral AI (text) and Pixtral (images)
