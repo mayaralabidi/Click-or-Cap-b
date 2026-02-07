@@ -130,16 +130,6 @@ No spaces around `=`, no quotes. One key per line.
 uvicorn backend.main:app --reload --port 8000
 ```
 
-Then open:
-
-- http://localhost:8000/api — API info
-- http://localhost:8000/health — Health
-- http://localhost:8000/health/ai — API key status
-
-If `mistral_configured: false`, fix your `.env`.
-
----
-
 ### Part B: Web Frontend
 
 #### 2.1 Access the App
@@ -147,8 +137,8 @@ If `mistral_configured: false`, fix your `.env`.
 With the server running, the frontend is served at `http://localhost:8000/`.
 
 - **Landing**: http://localhost:8000/
-- **Dashboard**: http://localhost:8000/dashboard.html
-- **Image AI**: http://localhost:8000/image_analysis.html
+- **Dashboard**: http://localhost:8000/dashboard
+- **Image AI**: http://localhost:8000/image_analysis
 
 #### 2.2 Test Text Analysis
 
@@ -194,9 +184,7 @@ const API_BASE_URL = 'http://localhost:8000';
 #### 3.3 Use the Extension
 
 - **Popup**: Click the extension icon for score and leaderboard
-- **Page scan**: Visit a page; text is scanned automatically
-- **Empathy mirror**: Type in textareas; you get feedback on drafts
-- **Content hiding**: Toxic content is hidden or warned
+- **Content hiding**: Bad Words are hidden
 
 ---
 
