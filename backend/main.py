@@ -20,7 +20,7 @@ from backend.routers import decision, users, game, hate_weather
 # Paths (project root relative to backend/)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
-EXTENSION_DIR = PROJECT_ROOT / "extension"
+EXTENSION_DIR = PROJECT_ROOT / "AdvancedProfanityFilter-main"
 
 app = FastAPI(
     title="Click-or-Cap API",

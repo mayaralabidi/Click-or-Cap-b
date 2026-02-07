@@ -67,7 +67,8 @@ const LandingPage = () => {
           </div>
           <div className="flex items-center gap-4">
             <a 
-              href="#"
+              href={`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/download/extension`}
+              download="click-or-cap-extension.zip"
               className="px-6 py-2 bg-white text-black font-bold uppercase tracking-wide border-[3px] border-black shadow-[4px_4px_0px_0px_#e12320] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all rounded-lg flex items-center gap-2"
             >
               <Download size={20} />
