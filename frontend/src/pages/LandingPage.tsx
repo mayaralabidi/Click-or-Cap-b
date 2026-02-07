@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PlayCircle, FileSearch, Image, ArrowRight, Shield, Zap, Users, CheckCircle } from 'lucide-react';
+import { PlayCircle, FileSearch, Image, ArrowRight, Shield, Zap, Users, CheckCircle, Download } from 'lucide-react';
 
 const LandingPage = () => {
   const features = [
@@ -65,12 +65,21 @@ const LandingPage = () => {
               Click or <span className="text-[#e12320]">Cap</span>
             </span>
           </div>
-          <Link 
-            to="/dashboard"
-            className="px-6 py-2 bg-black text-white font-bold uppercase tracking-wide border-[3px] border-black shadow-[4px_4px_0px_0px_#e12320] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all rounded-lg"
-          >
-            Launch Dashboard
-          </Link>
+          <div className="flex items-center gap-4">
+            <a 
+              href="#"
+              className="px-6 py-2 bg-white text-black font-bold uppercase tracking-wide border-[3px] border-black shadow-[4px_4px_0px_0px_#e12320] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all rounded-lg flex items-center gap-2"
+            >
+              <Download size={20} />
+              Download Extension
+            </a>
+            <Link 
+              to="/dashboard"
+              className="px-6 py-2 bg-black text-white font-bold uppercase tracking-wide border-[3px] border-black shadow-[4px_4px_0px_0px_#e12320] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all rounded-lg"
+            >
+              Launch Dashboard
+            </Link>
+          </div>
         </div>
       </nav>
 
