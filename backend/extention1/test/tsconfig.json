@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "../",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "moduleResolution": "node",
+    "noEmit": true,
+    "paths": {
+      "@APF/*": ["src/script/*"],
+      "@VENDOR/*": ["src/script/vendor/*"]
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "esnext"
+  },
+  "include": ["./spec/**/*.spec.ts"]
+}

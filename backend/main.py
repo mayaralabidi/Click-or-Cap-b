@@ -15,7 +15,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
-from backend.routers import decision, users
+from backend.routers import decision, users, game
 
 # Paths (project root relative to backend/)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -40,6 +40,7 @@ app.add_middleware(
 # Include routers (must be before static mount)
 app.include_router(decision.router, prefix="/decision", tags=["Decision Engine"])
 app.include_router(users.router, prefix="/users", tags=["Users & Gamification"])
+app.include_router(game.router, prefix="/game", tags=["Game"])
 
 @app.get("/api")
 def api_info():
@@ -55,6 +56,10 @@ def api_info():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+@app.get("/debug/test")
+def debug_test():
+    return {"status": "debug_route_working", "game_router_imported": "game" in globals()}
 
 
 @app.get("/health/ai")

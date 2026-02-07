@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Defined in Frontend DNA */
+  .neo-btn {
+    @apply bg-black text-white 
+           border-[3px] border-black 
+           py-3 px-8 
+           font-black uppercase text-sm tracking-widest 
+           shadow-[4px_4px_0px_0px_#e12320] 
+           transition-all 
+           active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+  }
+  
+  .neo-btn-secondary {
+    @apply bg-white text-black 
+           border-[3px] border-black 
+           py-3 px-8 
+           font-black uppercase text-sm tracking-widest 
+           shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] 
+           transition-all 
+           active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+  }
+
+  .neo-card {
+    @apply bg-[#FAF9F6] 
+           border-[3px] border-black 
+           p-8 
+           shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] 
+           transition-all 
+           hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)];
+  }
+}
+
+/* Animations from DNA */
+@keyframes scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(200%); }
+}
+
+.scan-line {
+  @apply absolute w-full h-[2px] opacity-20;
+  background: linear-gradient(to right, transparent, black, transparent);
+  animation: scan 4s linear infinite;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+}
