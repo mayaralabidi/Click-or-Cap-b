@@ -9,6 +9,7 @@ import EmpathyMirror from './pages/EmpathyMirror';
 import DeEscalator from './pages/DeEscalator';
 import ImageAnalysis from './pages/ImageAnalysis';
 import ClickOrCap from './pages/ClickOrCap';
+import HateWeatherReport from './pages/HateWeatherReport';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="empathy" element={<EmpathyMirror />} />
           <Route path="de-escalate" element={<DeEscalator />} />
           <Route path="image-analysis" element={<ImageAnalysis />} />
+          <Route path="hate-weather" element={<HateWeatherReport />} />
         </Route>
       </Routes>
     </Router>

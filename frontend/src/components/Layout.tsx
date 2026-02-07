@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Search, Heart, MessageCircle, Image, PlayCircle, Menu, ChevronLeft, ChevronRight, Bell, User, FileSearch } from 'lucide-react';
+import { LayoutDashboard, Search, Heart, MessageCircle, Image, PlayCircle, Menu, ChevronLeft, ChevronRight, Bell, User, FileSearch, Cloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { GameProvider, useGame } from '../context/GameContext';
@@ -23,9 +23,10 @@ const LayoutContent = () => {
     { to: "/dashboard", end: true, icon: LayoutDashboard, label: "Dashboard" },
     { to: "/dashboard/play", icon: PlayCircle, label: "Click or Cap" },
     { to: "/dashboard/analyze", label: "Analyze Text", icon: FileSearch },
+    { to: "/dashboard/image-analysis", icon: Image, label: "Image Analysis" },
+    { to: "/dashboard/hate-weather", icon: Cloud, label: "Hate Weather Report" },
     { to: "/dashboard/empathy", icon: Heart, label: "Empathy Mirror" },
     { to: "/dashboard/de-escalate", icon: MessageCircle, label: "De-Escalator" },
-    { to: "/dashboard/image-analysis", icon: Image, label: "Image Analysis" },
   ];
 
   return (

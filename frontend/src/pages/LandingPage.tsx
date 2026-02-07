@@ -31,7 +31,6 @@ const LandingPage = () => {
   const stats = [
     { value: "10K+", label: "Headlines Analyzed" },
     { value: "95%", label: "Detection Accuracy" },
-    { value: "Real-time", label: "AI Processing" },
     { value: "Free", label: "No Signup Required" }
   ];
 
@@ -114,7 +113,7 @@ const LandingPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 max-w-5xl mx-auto"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 max-w-4xl mx-auto"
           >
             {stats.map((stat, index) => (
               <div key={index} className="bg-white border-[3px] border-black p-6 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl">
@@ -189,20 +188,14 @@ const LandingPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative"
               >
-                <div className="bg-white border-[3px] border-black p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-xl text-center">
+                <div className="bg-white border-[3px] border-black p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-xl text-center h-full flex flex-col">
                   <div className="w-16 h-16 bg-[#e12320] border-[3px] border-black text-white text-3xl font-black flex items-center justify-center mx-auto mb-6 rounded-full">
                     {item.step}
                   </div>
                   <h3 className="text-2xl font-black uppercase mb-3">{item.title}</h3>
-                  <p className="text-gray-700 font-medium">{item.description}</p>
+                  <p className="text-gray-700 font-medium flex-1">{item.description}</p>
                 </div>
-                {index < howItWorks.length - 1 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                    <ArrowRight size={32} className="text-gray-300" strokeWidth={3} />
-                  </div>
-                )}
               </motion.div>
             ))}
           </div>
@@ -216,17 +209,17 @@ const LandingPage = () => {
             <div className="flex flex-col items-center gap-3">
               <Shield size={48} className="text-[#e12320]" strokeWidth={2.5} />
               <h3 className="font-black uppercase text-lg">AI-Powered</h3>
-              <p className="text-gray-600 font-medium text-sm">Advanced machine learning models</p>
+              <p className="text-gray-600 font-medium text-sm">Cutting-edge detection technology</p>
             </div>
             <div className="flex flex-col items-center gap-3">
               <Zap size={48} className="text-[#e12320]" strokeWidth={2.5} />
-              <h3 className="font-black uppercase text-lg">Real-Time Analysis</h3>
-              <p className="text-gray-600 font-medium text-sm">Instant results in milliseconds</p>
+              <h3 className="font-black uppercase text-lg">100% Free</h3>
+              <p className="text-gray-600 font-medium text-sm">No hidden fees, no subscriptions</p>
             </div>
             <div className="flex flex-col items-center gap-3">
               <Users size={48} className="text-[#e12320]" strokeWidth={2.5} />
               <h3 className="font-black uppercase text-lg">Community Driven</h3>
-              <p className="text-gray-600 font-medium text-sm">Built for a safer internet</p>
+              <p className="text-gray-600 font-medium text-sm">Join thousands fighting misinformation</p>
             </div>
           </div>
         </div>

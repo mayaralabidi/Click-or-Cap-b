@@ -172,48 +172,50 @@ const ClickOrCap = () => {
       </div>
 
       {/* Game Area */}
-      <div className="relative w-full max-w-sm h-96 flex items-center justify-center">
-          {loading ? (
-              <div className="flex flex-col items-center gap-4">
-                 <Loader2 size={48} className="animate-spin text-[#e12320]" />
-                 <p className="font-bold uppercase tracking-widest">Loading Deck...</p>
+      {!showInstructions && (
+        <div className="relative w-full max-w-sm h-96 flex items-center justify-center">
+            {loading ? (
+                <div className="flex flex-col items-center gap-4">
+                   <Loader2 size={48} className="animate-spin text-[#e12320]" />
+                   <p className="font-bold uppercase tracking-widest">Loading Deck...</p>
+                </div>
+            ) : (
+                <AnimatePresence>
+                    {cards.map((card, index) => (
+                        index === 0 && (
+                            <Card key={card.id} data={card} onSwipe={onSwipe} />
+                        )
+                    ))}
+                </AnimatePresence>
+            )}
+            
+            {error && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-red-100 border-[3px] border-red-600 rounded-xl z-20">
+                 <strong className="text-red-700 text-xl mb-2">Error Loading Deck</strong>
+                 <p className="font-mono text-sm text-red-900 mb-4 bg-white p-2 border border-red-200 rounded">{error}</p>
+                 <button onClick={fetchDeck} className="px-4 py-2 bg-red-600 text-white font-bold rounded hover:bg-red-700 flex items-center gap-2">
+                    <RefreshCw size={16} /> Retry
+                 </button>
               </div>
-          ) : (
-              <AnimatePresence>
-                  {cards.map((card, index) => (
-                      index === 0 && (
-                          <Card key={card.id} data={card} onSwipe={onSwipe} />
-                      )
-                  ))}
-              </AnimatePresence>
-          )}
-          
-          {error && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-red-100 border-[3px] border-red-600 rounded-xl z-20">
-               <strong className="text-red-700 text-xl mb-2">Error Loading Deck</strong>
-               <p className="font-mono text-sm text-red-900 mb-4 bg-white p-2 border border-red-200 rounded">{error}</p>
-               <button onClick={fetchDeck} className="px-4 py-2 bg-red-600 text-white font-bold rounded hover:bg-red-700 flex items-center gap-2">
-                  <RefreshCw size={16} /> Retry
-               </button>
-            </div>
-          )}
+            )}
 
-          {/* Game Over */}
-          {gameOver && !loading && !error && (
-              <div className="absolute inset-0 bg-[#FAF9F6] border-[3px] border-black p-8 flex flex-col items-center justify-center text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl z-10">
-                  <Trophy size={64} className="text-[#e12320] mb-6" />
-                  <h3 className="text-3xl font-black uppercase mb-2">Game Over!</h3>
-                  <p className="text-xl font-bold mb-6">Final Score: {score}</p>
-                  <button onClick={resetGame} className="neo-btn flex items-center gap-2 rounded-xl">
-                      <RefreshCw size={20} /> Play Again
-                  </button>
-              </div>
-          )}
-      </div>
+            {/* Game Over */}
+            {gameOver && !loading && !error && (
+                <div className="absolute inset-0 bg-[#FAF9F6] border-[3px] border-black p-8 flex flex-col items-center justify-center text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl z-10">
+                    <Trophy size={64} className="text-[#e12320] mb-6" />
+                    <h3 className="text-3xl font-black uppercase mb-2">Game Over!</h3>
+                    <p className="text-xl font-bold mb-6">Final Score: {score}</p>
+                    <button onClick={resetGame} className="neo-btn flex items-center gap-2 rounded-xl">
+                        <RefreshCw size={20} /> Play Again
+                    </button>
+                </div>
+            )}
+        </div>
+      )}
 
       {/* Instructions Modal */}
       {showInstructions && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
               <div className="bg-white border-[3px] border-black p-8 max-w-md w-full shadow-[8px_8px_0px_0px_#e12320] rounded-xl relative animate-in zoom-in-95 duration-200">
                   <button onClick={() => setShowInstructions(false)} className="absolute top-4 right-4 hover:rotate-90 transition-transform">
                       <X size={24} />

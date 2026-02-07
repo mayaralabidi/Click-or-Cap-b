@@ -15,7 +15,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
-from backend.routers import decision, users, game
+from backend.routers import decision, users, game, hate_weather
 
 # Paths (project root relative to backend/)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -41,6 +41,7 @@ app.add_middleware(
 app.include_router(decision.router, prefix="/decision", tags=["Decision Engine"])
 app.include_router(users.router, prefix="/users", tags=["Users & Gamification"])
 app.include_router(game.router, prefix="/game", tags=["Game"])
+app.include_router(hate_weather.router, prefix="/hate-weather", tags=["Hate Weather"])
 
 @app.get("/api")
 def api_info():
