@@ -155,21 +155,21 @@ const HateWeatherReport = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white border-[3px] border-black p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-xl"
+          className="bg-white border-[3px] border-black p-4 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-xl"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4 md:gap-6">
               {getWeatherIcon(globalStats.severity)}
               <div>
-                <h3 className="text-3xl font-black uppercase mb-1">Global Toxicity</h3>
-                <p className="text-gray-600 font-medium">{globalStats.description}</p>
+                <h3 className="text-2xl md:text-3xl font-black uppercase mb-1">Global Toxicity</h3>
+                <p className="text-gray-600 font-medium text-sm md:text-base">{globalStats.description}</p>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-6xl font-black text-[#e12320] mb-2">
+            <div className="text-left md:text-right w-full md:w-auto">
+              <div className="text-5xl md:text-6xl font-black text-[#e12320] mb-2">
                 {globalStats.toxicityLevel}%
               </div>
-              <div className="flex items-center gap-2 justify-end">
+              <div className="flex items-center gap-2 justify-start md:justify-end">
                 {getTrendIcon(globalStats.trend)}
                 <span className="text-sm font-bold uppercase text-gray-600">
                   {globalStats.trend}
@@ -182,16 +182,18 @@ const HateWeatherReport = () => {
 
       {/* Platform Comparison */}
       <div>
-        <h3 className="text-3xl font-black uppercase mb-4">Platform Breakdown</h3>
-        <div className="grid md:grid-cols-3 gap-6">
+        <h3 className="text-2xl md:text-3xl font-black uppercase mb-4">Platform Breakdown</h3>
+        {/* Mobile: Horizontal Scroll (Slider) | Desktop: Grid */}
+        <div className="flex overflow-x-auto pb-6 -mx-4 px-4 gap-4 md:grid md:grid-cols-3 md:overflow-visible md:pb-0 md:mx-0 md:gap-6 snap-x no-scrollbar">
           {platformStats.map((platform, index) => (
-            <PlatformCard
-              key={platform.platform}
-              data={platform}
-              index={index}
-              getWeatherIcon={getWeatherIcon}
-              getTrendIcon={getTrendIcon}
-            />
+            <div key={platform.platform} className="min-w-[70vw] sm:min-w-[300px] md:min-w-0 snap-center">
+              <PlatformCard
+                data={platform}
+                index={index}
+                getWeatherIcon={getWeatherIcon}
+                getTrendIcon={getTrendIcon}
+              />
+            </div>
           ))}
         </div>
       </div>

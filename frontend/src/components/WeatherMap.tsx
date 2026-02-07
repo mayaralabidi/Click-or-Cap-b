@@ -36,17 +36,15 @@ const WeatherMap: React.FC<WeatherMapProps> = ({ regionalData }) => {
     const iso3 = geoProperties?.ISO_A3;
     const name = geoProperties?.NAME;
     
-    // Debug logging
-    console.log('Checking country:', { iso2, iso3, name });
-    
     const match = regionalData.find(d => 
       d.countryCode === iso2 || 
       d.countryCode === iso3 ||
       d.country.toLowerCase() === name?.toLowerCase()
     );
     
+    // Only log when hovering (reduce console spam)
     if (match) {
-      console.log('✅ Match found:', match.country);
+      console.log('✅ MATCH:', name, '→', match.country, 'Toxicity:', match.toxicityLevel);
     }
     
     return match;
@@ -83,12 +81,15 @@ const WeatherMap: React.FC<WeatherMapProps> = ({ regionalData }) => {
                   stroke="#000000"
                   strokeWidth={0.5}
                   onMouseEnter={() => {
+                    console.log('🖱️ Mouse enter:', geo.properties?.NAME, 'Has data:', !!countryData);
                     if (countryData) {
                       setHoveredCountry(countryData);
                       setTooltipContent(countryData.country);
+                      console.log('📍 Tooltip set for:', countryData.country);
                     }
                   }}
                   onMouseLeave={() => {
+                    console.log('🖱️ Mouse leave');
                     setHoveredCountry(null);
                     setTooltipContent('');
                   }}
